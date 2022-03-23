@@ -1,5 +1,6 @@
 package com.example.familymapclient;
 
+import android.location.GnssAntennaInfo;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 /**
@@ -20,6 +22,7 @@ public class LoginFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private Listener listener;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -28,6 +31,12 @@ public class LoginFragment extends Fragment {
     public LoginFragment() {
 
     }
+
+    public interface Listener {
+        void notifyDone();
+    }
+
+    public void registerListener(Listener listener) { this.listener = listener; }
 
     /**
      * Use this factory method to create a new instance of
@@ -67,6 +76,8 @@ public class LoginFragment extends Fragment {
         EditText firstName = view.findViewById(R.id.firstName);
         EditText lastName = view.findViewById(R.id.lastName);
         EditText email = view.findViewById(R.id.email);
+        Button signInButton = view.findViewById(R.id.signInButton);
+        Button registerButton = view.findViewById(R.id.registerButton);
 
         return view;
     }

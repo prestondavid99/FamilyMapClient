@@ -17,4 +17,8 @@
     <string name="email">Email:</string>
     <string name="enter_email">Enter Email</string>
     <string name="gender">Gender:</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="sign_in">Sign In</string>
+    <string name="register">Register</string>
 </resources>
