@@ -15,13 +15,13 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/serverHost"
+                android:id="@+id/serverHostText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/server_host" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName"
+                android:id="@+id/serverHost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -40,7 +40,7 @@
                 android:text="@string/server_port" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName2"
+                android:id="@+id/serverPort"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -59,7 +59,7 @@
                 android:text="@string/username" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName3"
+                android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -78,7 +78,7 @@
                 android:text="@string/password" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName4"
+                android:id="@+id/password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -97,7 +97,7 @@
                 android:text="@string/first_name" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName5"
+                android:id="@+id/firstName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -116,7 +116,7 @@
                 android:text="@string/last_name" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName6"
+                android:id="@+id/lastName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -135,7 +135,7 @@
                 android:text="@string/email" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName7"
+                android:id="@+id/email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -158,13 +158,13 @@
                 android:layout_height="wrap_content">
 
                 <RadioButton
-                    android:id="@+id/radioButton"
+                    android:id="@+id/maleButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Male" />
 
                 <RadioButton
-                    android:id="@+id/radioButton2"
+                    android:id="@+id/femaleButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Female" />
@@ -176,14 +176,14 @@
             android:layout_height="match_parent" >
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/signInButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Sign In" />
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/registerButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

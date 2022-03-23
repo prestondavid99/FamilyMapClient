@@ -61,6 +61,12 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         EditText serverHost = view.findViewById(R.id.serverHost);
+        EditText serverPort = view.findViewById(R.id.serverPort);
+        EditText username = view.findViewById(R.id.username);
+        EditText password = view.findViewById(R.id.password);
+        EditText firstName = view.findViewById(R.id.firstName);
+        EditText lastName = view.findViewById(R.id.lastName);
+        EditText email = view.findViewById(R.id.email);
 
         return view;
     }
