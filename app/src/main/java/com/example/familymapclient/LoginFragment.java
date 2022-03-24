@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,11 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,20 +106,32 @@ public class LoginFragment extends Fragment {
         /* Buttons */
         Button signInButton = view.findViewById(R.id.signInButton);
         signInButton.setOnClickListener(new View.OnClickListener() {
-
-//            Handler threadHandler = new Handler(Looper.getMainLooper()) {
-//                public void handleMessage(Message message) {
-//                    Bundle bundle = message.getData();
-//                    long totalSize = bundle.getLong(TOTAL_SIZE_KEY, 0);
-//                    totalSizeTextView.setText(getString(R.string.));
-//                }
-//            }
             @Override
             public void onClick(View view) {
-                if(listener != null) {
-                    listener.signedIn();
+                try {
+                    if(listener != null) {
+                        listener.signedIn();
+
+                        Handler threadHandler = new Handler(Looper.getMainLooper()) {
+                            public void handleMessage(Message message) {
+                                Bundle bundle = message.getData();
+                                long totalSize = bundle.getLong(TOTAL_SIZE_KEY, 0);
+                                //totalSizeTextView.setText(getString(R.string.));
+                            }
+                        };
+                        DownloadTask task = new DownloadTask(threadHandler, new URL("insertURL"), new URL("anotherOne"), new URL("somethingElse"));
+                        ExecutorService executor = Executors.newSingleThreadExecutor();
+                        executor.submit(task);
+
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
                 }
+
             }
+
+
+
         });
 
         Button registerButton = view.findViewById(R.id.registerButton);
