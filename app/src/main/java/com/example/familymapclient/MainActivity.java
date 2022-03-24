@@ -8,6 +8,9 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +39,15 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
     }
 
     @Override
-    public void notifyDone() {
+    public void signedIn() {
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        Fragment fragment = new MapsFragment();
+
+        fragmentManager.beginTransaction().replace(R.id.fragmentFrameLayout, fragment).commit();
+    }
+
+    @Override
+    public void registered() {
 
     }
 

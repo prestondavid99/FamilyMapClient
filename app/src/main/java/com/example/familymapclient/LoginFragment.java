@@ -5,11 +5,17 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +29,9 @@ public class LoginFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private Listener listener;
+    private static final String LOG_TAG = "MainActivity";
+    private static final String TOTAL_SIZE_KEY = "TotalSizeKey";
+    private TextView totalSizeTextView;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -33,7 +42,8 @@ public class LoginFragment extends Fragment {
     }
 
     public interface Listener {
-        void notifyDone();
+        void signedIn();
+        void registered();
     }
 
     public void registerListener(Listener listener) { this.listener = listener; }
@@ -69,6 +79,8 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+
+        /* EditText */
         EditText serverHost = view.findViewById(R.id.serverHost);
         EditText serverPort = view.findViewById(R.id.serverPort);
         EditText username = view.findViewById(R.id.username);
@@ -76,9 +88,43 @@ public class LoginFragment extends Fragment {
         EditText firstName = view.findViewById(R.id.firstName);
         EditText lastName = view.findViewById(R.id.lastName);
         EditText email = view.findViewById(R.id.email);
-        Button signInButton = view.findViewById(R.id.signInButton);
-        Button registerButton = view.findViewById(R.id.registerButton);
 
+        /* Radio Buttons */
+        RadioGroup radioGroup;
+        RadioButton radioButton;
+        radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup);
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+        radioButton = (RadioButton) view.findViewById(selectedId);
+        String gender = radioButton.getText().toString();
+
+        /* Buttons */
+        Button signInButton = view.findViewById(R.id.signInButton);
+        signInButton.setOnClickListener(new View.OnClickListener() {
+
+//            Handler threadHandler = new Handler(Looper.getMainLooper()) {
+//                public void handleMessage(Message message) {
+//                    Bundle bundle = message.getData();
+//                    long totalSize = bundle.getLong(TOTAL_SIZE_KEY, 0);
+//                    totalSizeTextView.setText(getString(R.string.));
+//                }
+//            }
+            @Override
+            public void onClick(View view) {
+                if(listener != null) {
+                    listener.signedIn();
+                }
+            }
+        });
+
+        Button registerButton = view.findViewById(R.id.registerButton);
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(listener != null) {
+                    listener.registered();
+                }
+            }
+        });
         return view;
     }
 }
