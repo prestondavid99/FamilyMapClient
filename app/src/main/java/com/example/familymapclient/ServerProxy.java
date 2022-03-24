@@ -15,7 +15,15 @@ import java.net.*;
 
 public class ServerProxy {
 
-    private static LoginResult login(String serverHost, String serverPort, LoginRequest r) {
+    private String serverHost;
+    private String serverPort;
+
+    public ServerProxy(String serverHost, String serverPort) {
+        this.serverHost = serverHost;
+        this.serverPort = serverPort;
+    }
+
+    public LoginResult login(LoginRequest r) {
 
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/user/login");
@@ -83,7 +91,7 @@ public class ServerProxy {
         return null;
     }
 
-    private static PersonResult getPeople(String serverHost, String serverPort, String authToken) {
+    public PersonResult getPeople(String serverHost, String serverPort, String authToken) {
 
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/person");
@@ -136,7 +144,7 @@ public class ServerProxy {
         return null;
     }
 
-    private static EventResult getEvents(String serverHost, String serverPort, String authToken) {
+    public EventResult getEvents(String serverHost, String serverPort, String authToken) {
 
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/event");
@@ -189,7 +197,7 @@ public class ServerProxy {
         return null;
     }
 
-    private static RegisterResult register(String serverHost, String serverPort, RegisterRequest r) {
+    public RegisterResult register(String serverHost, String serverPort, RegisterRequest r) {
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/user/register");
 

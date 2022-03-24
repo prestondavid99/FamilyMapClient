@@ -6,24 +6,33 @@ import android.os.Message;
 
 import java.net.URL;
 
+import requestresult.LoginResult;
+import requestresult.LoginRequest;
+
 public class DownloadTask implements Runnable {
     private final Handler messageHandler;
-    private final URL[] urls;
+    private String hostServer;
+    private String hostPort;
+    private LoginRequest l;
 
-    public DownloadTask(Handler messageHandler, URL[] urls) {
+    public DownloadTask(Handler messageHandler, String hostSever, String hostPort, LoginRequest l) {
         this.messageHandler = messageHandler;
-        this.urls = urls;
+        this.hostServer = hostSever;
+        this.hostPort = hostPort;
+        this.l = l;
     }
 
     @Override
     public void run() {
-        // TODO : sendMessage(totalSize?);
+        ServerProxy sp = new ServerProxy(hostServer, hostPort);
+        LoginResult loginResult = sp.login(l);
+        sendMessage(loginResult);
     }
 
-    private void sendMessage(long totalSize) {
+    private void sendMessage(LoginResult result) {
         Message message = Message.obtain();
         Bundle messageBundle = new Bundle();
-        // TODO : messageBundle.putLong(TOTAL_SIZE_KEY, totalSize);
+        messageBundle.putBoolean("Success", result.isSuccess());
         message.setData(messageBundle);
         messageHandler.sendMessage(message);
     }

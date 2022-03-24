@@ -1,5 +1,6 @@
 package com.example.familymapclient;
 
+import android.content.Context;
 import android.location.GnssAntennaInfo;
 import android.os.Bundle;
 
@@ -17,11 +18,14 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import requestresult.LoginRequest;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -109,22 +113,34 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 try {
+
+                    LoginRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
                     if(listener != null) {
                         listener.signedIn();
 
                         Handler threadHandler = new Handler(Looper.getMainLooper()) {
                             public void handleMessage(Message message) {
                                 Bundle bundle = message.getData();
-                                long totalSize = bundle.getLong(TOTAL_SIZE_KEY, 0);
-                                //totalSizeTextView.setText(getString(R.string.));
+                                boolean isSuccess = bundle.getBoolean("Success");
+                                Context context = getActivity();
+                                CharSequence text;
+                                if (isSuccess) {
+                                    text = "Login Successful";
+                                } else {
+                                    text = "Login Failed";
+                                }
+
+                                int duration = Toast.LENGTH_SHORT;
+
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
                             }
                         };
-                        DownloadTask task = new DownloadTask(threadHandler, new URL("insertURL"), new URL("anotherOne"), new URL("somethingElse"));
+                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest);
                         ExecutorService executor = Executors.newSingleThreadExecutor();
                         executor.submit(task);
-
                     }
-                } catch (MalformedURLException e) {
+                } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
                 }
 
