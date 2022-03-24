@@ -91,7 +91,7 @@ public class ServerProxy {
         return null;
     }
 
-    public PersonResult getPeople(String serverHost, String serverPort, String authToken) {
+    public PersonResult getPeople(String authToken) {
 
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/person");
@@ -144,7 +144,7 @@ public class ServerProxy {
         return null;
     }
 
-    public EventResult getEvents(String serverHost, String serverPort, String authToken) {
+    public EventResult getEvents(String authToken) {
 
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/event");

@@ -110,6 +110,7 @@ public class LoginFragment extends Fragment {
         /* Buttons */
         Button signInButton = view.findViewById(R.id.signInButton);
         signInButton.setOnClickListener(new View.OnClickListener() {
+            Context context = getActivity();
             @Override
             public void onClick(View view) {
                 try {
@@ -122,7 +123,7 @@ public class LoginFragment extends Fragment {
                             public void handleMessage(Message message) {
                                 Bundle bundle = message.getData();
                                 boolean isSuccess = bundle.getBoolean("Success");
-                                Context context = getActivity();
+
                                 CharSequence text;
                                 if (isSuccess) {
                                     text = "Login Successful";
@@ -136,7 +137,7 @@ public class LoginFragment extends Fragment {
                                 toast.show();
                             }
                         };
-                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest);
+                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest, context);
                         ExecutorService executor = Executors.newSingleThreadExecutor();
                         executor.submit(task);
                     }
