@@ -158,12 +158,13 @@ public class LoginFragment extends Fragment {
                 try {
                     /* Radio Buttons */
 
-                    RadioButton radioButton;
+
                     int selectedId = radioGroup.getCheckedRadioButtonId();
-                    radioButton = (RadioButton) view.findViewById(selectedId);
+
+                    RadioButton radioButton = (RadioButton) getActivity().findViewById(selectedId);
                     String gender = radioButton.getText().toString();
                     RegisterRequest registerRequest = new RegisterRequest(username.getText().toString(), password.getText().toString(),
-                    email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
+                        email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
                     if(listener != null) {
                         listener.signedIn();
