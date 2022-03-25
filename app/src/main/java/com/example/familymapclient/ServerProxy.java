@@ -197,7 +197,7 @@ public class ServerProxy {
         return null;
     }
 
-    public RegisterResult register(String serverHost, String serverPort, RegisterRequest r) {
+    public RegisterResult register(RegisterRequest r) {
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/user/register");
 

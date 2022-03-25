@@ -7,28 +7,34 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
-import java.net.URL;
-import java.util.List;
-
 import model.Person;
 import requestresult.EventResult;
-import requestresult.LoginResult;
 import requestresult.LoginRequest;
+import requestresult.LoginResult;
 import requestresult.PersonResult;
+import requestresult.RegisterRequest;
+import requestresult.RegisterResult;
+
 
 public class DownloadTask implements Runnable {
     private final Handler messageHandler;
     private String hostServer;
     private String hostPort;
     private LoginRequest l;
-    private Context context;
+    private RegisterRequest r;
 
-    public DownloadTask(Handler messageHandler, String hostSever, String hostPort, LoginRequest l, Context context) {
+    public DownloadTask(Handler messageHandler, String hostSever, String hostPort, LoginRequest l) {
         this.messageHandler = messageHandler;
         this.hostServer = hostSever;
         this.hostPort = hostPort;
         this.l = l;
-        this.context = context;
+    }
+
+    public DownloadTask(Handler messageHandler, String hostSever, String hostPort, RegisterRequest r) {
+        this.messageHandler = messageHandler;
+        this.hostServer = hostSever;
+        this.hostPort = hostPort;
+        this.r = r;
     }
 
     @Override
@@ -38,7 +44,8 @@ public class DownloadTask implements Runnable {
         DataCache dataCache = DataCache.getInstance();
         ServerProxy sp = new ServerProxy(hostServer, hostPort);
         LoginResult loginResult = sp.login(l);
-
+        RegisterResult registerResult = sp.register(r);
+        String text = null;
         if (loginResult.isSuccess()) {
             EventResult eventResult = sp.getEvents(loginResult.getAuthtoken());
             PersonResult personResult = sp.getPeople(loginResult.getAuthtoken());
@@ -47,19 +54,26 @@ public class DownloadTask implements Runnable {
 
             Person person = findPerson(loginResult.getPersonID(), personResult.getData());
 
-            CharSequence text = person.getFirstName() + " " + person.getLastName();
-
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+            text = person.getFirstName() + " " + person.getLastName();
         }
-        sendMessage(loginResult);
+
+        if (registerResult.isSuccess()) {
+            EventResult eventResult = sp.getEvents(registerResult.getAuthtoken());
+            PersonResult personResult = sp.getPeople(registerResult.getAuthtoken());
+            dataCache.setEvents(eventResult.getData());
+            dataCache.setPeople(personResult.getData());
+
+            Person person = findPerson(loginResult.getPersonID(), personResult.getData());
+
+            text = person.getFirstName() + " " + person.getLastName();
+        }
+        sendMessage(loginResult, text);
     }
 
-    private void sendMessage(LoginResult result) {
+    private void sendMessage(LoginResult result, String text) {
         Message message = Message.obtain();
         Bundle messageBundle = new Bundle();
+        messageBundle.putString("firstLastName", text);
         messageBundle.putBoolean("Success", result.isSuccess());
         message.setData(messageBundle);
         messageHandler.sendMessage(message);

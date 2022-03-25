@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import requestresult.LoginRequest;
+import requestresult.RegisterRequest;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -99,22 +100,15 @@ public class LoginFragment extends Fragment {
         EditText lastName = view.findViewById(R.id.lastName);
         EditText email = view.findViewById(R.id.email);
 
-        /* Radio Buttons */
-        RadioGroup radioGroup;
-        RadioButton radioButton;
-        radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup);
-        int selectedId = radioGroup.getCheckedRadioButtonId();
-        radioButton = (RadioButton) view.findViewById(selectedId);
-        String gender = radioButton.getText().toString();
+
+
 
         /* Buttons */
         Button signInButton = view.findViewById(R.id.signInButton);
         signInButton.setOnClickListener(new View.OnClickListener() {
-            Context context = getActivity();
             @Override
             public void onClick(View view) {
                 try {
-
                     LoginRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
                     if(listener != null) {
                         listener.signedIn();
@@ -123,23 +117,26 @@ public class LoginFragment extends Fragment {
                             public void handleMessage(Message message) {
                                 Bundle bundle = message.getData();
                                 boolean isSuccess = bundle.getBoolean("Success");
-
+                                Context context = getActivity();
                                 CharSequence text;
+                                int duration = Toast.LENGTH_SHORT;
                                 if (isSuccess) {
                                     text = "Login Successful";
+                                    String firstLastName = bundle.getString("firstLastName");
+                                    Toast toast = Toast.makeText(context, firstLastName, duration);
+                                    toast.show();
                                 } else {
                                     text = "Login Failed";
                                 }
-
-                                int duration = Toast.LENGTH_SHORT;
 
                                 Toast toast = Toast.makeText(context, text, duration);
                                 toast.show();
                             }
                         };
-                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest, context);
+                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest);
                         ExecutorService executor = Executors.newSingleThreadExecutor();
                         executor.submit(task);
+
                     }
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
@@ -151,12 +148,53 @@ public class LoginFragment extends Fragment {
 
         });
 
+        RadioGroup radioGroup;
+
+        radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup);
         Button registerButton = view.findViewById(R.id.registerButton);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(listener != null) {
-                    listener.registered();
+                try {
+                    /* Radio Buttons */
+
+                    RadioButton radioButton;
+                    int selectedId = radioGroup.getCheckedRadioButtonId();
+                    radioButton = (RadioButton) view.findViewById(selectedId);
+                    String gender = radioButton.getText().toString();
+                    RegisterRequest registerRequest = new RegisterRequest(username.getText().toString(), password.getText().toString(),
+                    email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
+
+                    if(listener != null) {
+                        listener.signedIn();
+
+                        Handler threadHandler = new Handler(Looper.getMainLooper()) {
+                            public void handleMessage(Message message) {
+                                Bundle bundle = message.getData();
+                                boolean isSuccess = bundle.getBoolean("Success");
+                                Context context = getActivity();
+                                CharSequence text;
+                                int duration = Toast.LENGTH_SHORT;
+                                if (isSuccess) {
+                                    text = "Register Successful";
+                                    String firstLastName = bundle.getString("firstLastName");
+                                    Toast toast = Toast.makeText(context, firstLastName, duration);
+                                    toast.show();
+                                } else {
+                                    text = "Register Failed";
+                                }
+
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+                        };
+                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), registerRequest);
+                        ExecutorService executor = Executors.newSingleThreadExecutor();
+                        executor.submit(task);
+
+                    }
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
                 }
             }
         });
