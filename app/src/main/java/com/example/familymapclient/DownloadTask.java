@@ -40,36 +40,39 @@ public class DownloadTask implements Runnable {
     @Override
     public void run() {
 
-
         DataCache dataCache = DataCache.getInstance();
         ServerProxy sp = new ServerProxy(hostServer, hostPort);
         LoginResult loginResult = sp.login(l);
         RegisterResult registerResult = sp.register(r);
-        String text;
-        if (loginResult.isSuccess()) {
-            EventResult eventResult = sp.getEvents(loginResult.getAuthtoken());
-            PersonResult personResult = sp.getPeople(loginResult.getAuthtoken());
-            dataCache.setEvents(eventResult.getData());
-            dataCache.setPeople(personResult.getData());
+        String text = null;
+        if (loginResult != null) {
+            if (loginResult.isSuccess()) {
+                EventResult eventResult = sp.getEvents(loginResult.getAuthtoken());
+                PersonResult personResult = sp.getPeople(loginResult.getAuthtoken());
+                dataCache.setEvents(eventResult.getData());
+                dataCache.setPeople(personResult.getData());
 
-            Person person = findPerson(loginResult.getPersonID(), personResult.getData());
+                Person person = findPerson(loginResult.getPersonID(), personResult.getData());
 
-            text = person.getFirstName() + " " + person.getLastName();
-        } else {
-            text = "Login Failed;";
+                text = person.getFirstName() + " " + person.getLastName();
+            } else {
+                text = "Login Failed;";
+            }
         }
 
-        if (registerResult.isSuccess()) {
-            EventResult eventResult = sp.getEvents(registerResult.getAuthtoken());
-            PersonResult personResult = sp.getPeople(registerResult.getAuthtoken());
-            dataCache.setEvents(eventResult.getData());
-            dataCache.setPeople(personResult.getData());
+        if (registerResult != null) {
+            if (registerResult.isSuccess()) {
+                EventResult eventResult = sp.getEvents(registerResult.getAuthtoken());
+                PersonResult personResult = sp.getPeople(registerResult.getAuthtoken());
+                dataCache.setEvents(eventResult.getData());
+                dataCache.setPeople(personResult.getData());
 
-            Person person = findPerson(loginResult.getPersonID(), personResult.getData());
+                Person person = findPerson(loginResult.getPersonID(), personResult.getData());
 
-            text = person.getFirstName() + " " + person.getLastName();
-        } else {
-            text = "Register Failed;";
+                text = person.getFirstName() + " " + person.getLastName();
+            } else {
+                text = "Register Failed;";
+            }
         }
         sendMessage(loginResult, text);
     }

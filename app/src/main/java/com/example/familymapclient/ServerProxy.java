@@ -65,6 +65,7 @@ public class ServerProxy {
                 LoginResult result = gson.fromJson(respData, LoginResult.class);
                 // Display the JSON data returned from the server
                 System.out.println(respData);
+                result.setSuccess(true);
                 return result;
             }
             else {
@@ -81,6 +82,7 @@ public class ServerProxy {
 
                 // Display the data returned from the server
                 System.out.println(respData);
+                result.setSuccess(false);
                 return result;
             }
         }
@@ -228,6 +230,7 @@ public class ServerProxy {
                 RegisterResult result = gson.fromJson(respData, RegisterResult.class);
                 // Display the JSON data returned from the server
                 System.out.println(respData);
+                result.setSuccess(true);
                 return result;
             }
             else {
@@ -244,6 +247,7 @@ public class ServerProxy {
                 RegisterResult result = gson.fromJson(respData, RegisterResult.class);
 
                 // Display the data returned from the server
+                result.setSuccess(false);
                 System.out.println(respData);
                 return result;
             }

@@ -112,7 +112,8 @@ public class LoginFragment extends Fragment {
                     LoginRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
 
 
-                    Handler threadHandler = new Handler(Looper.getMainLooper()) {
+                    Handler threadHandler = new Handler() {
+                        @Override
                         public void handleMessage(Message message) {
                             Bundle bundle = message.getData();
                             boolean isSuccess = bundle.getBoolean("Success");
