@@ -110,34 +110,36 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 try {
                     LoginRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
-                    if(listener != null) {
-                        listener.signedIn();
 
-                        Handler threadHandler = new Handler(Looper.getMainLooper()) {
-                            public void handleMessage(Message message) {
-                                Bundle bundle = message.getData();
-                                boolean isSuccess = bundle.getBoolean("Success");
-                                Context context = getActivity();
-                                CharSequence text;
-                                int duration = Toast.LENGTH_SHORT;
-                                if (isSuccess) {
-                                    text = "Login Successful";
-                                    String firstLastName = bundle.getString("firstLastName");
-                                    Toast toast = Toast.makeText(context, firstLastName, duration);
-                                    toast.show();
-                                } else {
-                                    text = "Login Failed";
-                                }
 
-                                Toast toast = Toast.makeText(context, text, duration);
+                    Handler threadHandler = new Handler(Looper.getMainLooper()) {
+                        public void handleMessage(Message message) {
+                            Bundle bundle = message.getData();
+                            boolean isSuccess = bundle.getBoolean("Success");
+                            Context context = getActivity();
+                            CharSequence text;
+                            int duration = Toast.LENGTH_SHORT;
+                            if (isSuccess) {
+                                text = "Login Successful";
+                                String firstLastName = bundle.getString("firstLastName");
+                                Toast toast = Toast.makeText(context, firstLastName, duration);
                                 toast.show();
+                            } else {
+                                text = "Login Failed";
                             }
-                        };
-                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest);
-                        ExecutorService executor = Executors.newSingleThreadExecutor();
-                        executor.submit(task);
 
-                    }
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+//                            if (listener != null) {
+//                                listener.signedIn();
+//                            }
+                        }
+                    };
+                    DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest);
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    executor.submit(task);
+
+
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
                 }
@@ -157,8 +159,6 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 try {
                     /* Radio Buttons */
-
-
                     int selectedId = radioGroup.getCheckedRadioButtonId();
 
                     RadioButton radioButton = (RadioButton) getActivity().findViewById(selectedId);

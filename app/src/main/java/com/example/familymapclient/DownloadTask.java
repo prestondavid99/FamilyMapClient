@@ -45,7 +45,7 @@ public class DownloadTask implements Runnable {
         ServerProxy sp = new ServerProxy(hostServer, hostPort);
         LoginResult loginResult = sp.login(l);
         RegisterResult registerResult = sp.register(r);
-        String text = null;
+        String text;
         if (loginResult.isSuccess()) {
             EventResult eventResult = sp.getEvents(loginResult.getAuthtoken());
             PersonResult personResult = sp.getPeople(loginResult.getAuthtoken());
@@ -55,6 +55,8 @@ public class DownloadTask implements Runnable {
             Person person = findPerson(loginResult.getPersonID(), personResult.getData());
 
             text = person.getFirstName() + " " + person.getLastName();
+        } else {
+            text = "Login Failed;";
         }
 
         if (registerResult.isSuccess()) {
@@ -66,6 +68,8 @@ public class DownloadTask implements Runnable {
             Person person = findPerson(loginResult.getPersonID(), personResult.getData());
 
             text = person.getFirstName() + " " + person.getLastName();
+        } else {
+            text = "Register Failed;";
         }
         sendMessage(loginResult, text);
     }
