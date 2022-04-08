@@ -44,7 +44,9 @@ public class DownloadTask implements Runnable {
         ServerProxy sp = new ServerProxy(hostServer, hostPort);
         LoginResult loginResult = sp.login(l);
         RegisterResult registerResult = sp.register(r);
-        String text = null;
+        String text;
+
+        // TODO? : Does sign in have to toast an error for every single error? Like if it can't connect to the server?
         if (loginResult != null) {
             if (loginResult.isSuccess()) {
                 EventResult eventResult = sp.getEvents(loginResult.getAuthtoken());
@@ -58,6 +60,7 @@ public class DownloadTask implements Runnable {
             } else {
                 text = "Login Failed;";
             }
+            sendMessage(loginResult, text);
         }
 
         if (registerResult != null) {
@@ -67,17 +70,38 @@ public class DownloadTask implements Runnable {
                 dataCache.setEvents(eventResult.getData());
                 dataCache.setPeople(personResult.getData());
 
-                Person person = findPerson(loginResult.getPersonID(), personResult.getData());
+                Person person = findPerson(registerResult.getPersonID(), personResult.getData());
 
                 text = person.getFirstName() + " " + person.getLastName();
             } else {
                 text = "Register Failed;";
             }
+            sendMessage(registerResult, text);
         }
-        sendMessage(loginResult, text);
+
+        if (registerResult == null && loginResult == null) {
+            text = "Error";
+            sendMessage(loginResult, text);
+        }
     }
 
     private void sendMessage(LoginResult result, String text) {
+        Message message = Message.obtain();
+        Bundle messageBundle = new Bundle();
+        messageBundle.putString("firstLastName", text);
+        if (result == null) {
+            messageBundle.putBoolean("Failure", false);
+            message.setData(messageBundle);
+            messageHandler.sendMessage(message);
+        } else {
+            messageBundle.putBoolean("Success", result.isSuccess());
+            message.setData(messageBundle);
+            messageHandler.sendMessage(message);
+        }
+
+    }
+
+    private void sendMessage(RegisterResult result, String text) {
         Message message = Message.obtain();
         Bundle messageBundle = new Bundle();
         messageBundle.putString("firstLastName", text);

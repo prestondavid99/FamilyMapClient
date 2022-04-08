@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
                 ((LoginFragment) fragment).registerListener(this);
             }
         }
-
-
     }
 
     private Fragment createLoginFragment() {
@@ -41,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
     @Override
     public void signedIn() {
         FragmentManager fragmentManager = this.getSupportFragmentManager();
+        // TODO : Gets disconnected here?
         Fragment fragment = new MapsFragment();
-
         fragmentManager.beginTransaction().replace(R.id.fragmentFrameLayout, fragment).commit();
     }
 

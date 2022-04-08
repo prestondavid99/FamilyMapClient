@@ -120,6 +120,7 @@ public class ServerProxy {
                 PersonResult result = gson.fromJson(respData, PersonResult.class);
                 // Display the JSON data returned from the server
                 System.out.println(respData);
+                result.setSuccess(true);
                 return result;
             }
             else {
@@ -136,6 +137,7 @@ public class ServerProxy {
 
                 // Display the data returned from the server
                 System.out.println(respData);
+                result.setSuccess(false);
                 return result;
             }
         }
@@ -173,6 +175,7 @@ public class ServerProxy {
                 EventResult result = gson.fromJson(respData, EventResult.class);
                 // Display the JSON data returned from the server
                 System.out.println(respData);
+                result.setSuccess(true);
                 return result;
             }
             else {
@@ -189,6 +192,7 @@ public class ServerProxy {
 
                 // Display the data returned from the server
                 System.out.println(respData);
+                result.setSuccess(false);
                 return result;
             }
         }
@@ -209,8 +213,6 @@ public class ServerProxy {
 
             http.setDoOutput(true);
 
-            http.addRequestProperty("Accept", "application/json");
-
             http.connect();
 
             Gson gson = new Gson();
@@ -221,6 +223,8 @@ public class ServerProxy {
             // Write the JSON data to the request body
             writeString(reqData, reqBody);
 
+            reqBody.close();
+            // TODO : it should be ok, but it's not
             if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 // Get the input stream containing the HTTP response body
                 InputStream respBody = http.getInputStream();

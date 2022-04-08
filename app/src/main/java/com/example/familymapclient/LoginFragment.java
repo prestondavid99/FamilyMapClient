@@ -1,5 +1,6 @@
 package com.example.familymapclient;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.GnssAntennaInfo;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +50,18 @@ public class LoginFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private EditText serverHost;
+    private EditText serverPort;
+    private EditText username;
+    private EditText password;
+    private EditText firstName;
+    private EditText lastName;
+    private EditText email;
+    private Button signInButton;
+    private Button registerButton;
+    private boolean radioButtonClicked;
+    private RadioButton radioButton;
+    private String gender;
 
     public LoginFragment() {
 
@@ -77,6 +92,25 @@ public class LoginFragment extends Fragment {
         return fragment;
     }
 
+    public void validate() {
+        if (serverHost.getText().toString().equals("") || serverPort.getText().toString().equals("") || username.getText().toString().equals("")
+                || password.getText().toString().equals("")) {
+            signInButton.setEnabled(false);
+        } else {
+            signInButton.setEnabled(true);
+        }
+    }
+
+    public void validateRegister() {
+        if (serverHost.getText().toString().equals("") || serverPort.getText().toString().equals("") || username.getText().toString().equals("")
+                || password.getText().toString().equals("") || firstName.getText().toString().equals("") || lastName.getText().toString().equals("")
+                || email.getText().toString().equals("") || !radioButtonClicked) {
+            registerButton.setEnabled(false);
+        } else {
+            registerButton.setEnabled(true);
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,33 +120,69 @@ public class LoginFragment extends Fragment {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         /* EditText */
-        EditText serverHost = view.findViewById(R.id.serverHost);
-        EditText serverPort = view.findViewById(R.id.serverPort);
-        EditText username = view.findViewById(R.id.username);
-        EditText password = view.findViewById(R.id.password);
-        EditText firstName = view.findViewById(R.id.firstName);
-        EditText lastName = view.findViewById(R.id.lastName);
-        EditText email = view.findViewById(R.id.email);
+        serverHost = view.findViewById(R.id.serverHost);
+        serverPort = view.findViewById(R.id.serverPort);
+        username = view.findViewById(R.id.username);
+        password = view.findViewById(R.id.password);
+        firstName = view.findViewById(R.id.firstName);
+        lastName = view.findViewById(R.id.lastName);
+        email = view.findViewById(R.id.email);
 
+        serverHost.setText("10.0.2.2");
+        serverPort.setText("8080");
+        username.setText("thisUser");
+        password.setText("password");
+        firstName.setText("firsName");
+        lastName.setText("lastName");
+        email.setText("email");
 
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                validate();
+                validateRegister();
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        };
+
+        serverHost.addTextChangedListener(textWatcher);
+        serverPort.addTextChangedListener(textWatcher);
+        username.addTextChangedListener(textWatcher);
+        password.addTextChangedListener(textWatcher);
+        firstName.addTextChangedListener(textWatcher);
+        lastName.addTextChangedListener(textWatcher);
+        email.addTextChangedListener(textWatcher);
 
         /* Buttons */
-        Button signInButton = view.findViewById(R.id.signInButton);
+        signInButton = view.findViewById(R.id.signInButton);
+
+
+
+
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
                     LoginRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
-
-
-                    Handler threadHandler = new Handler() {
+                    @SuppressLint("HandlerLeak") Handler threadHandler = new Handler() {
+                        @SuppressLint("HandlerLeak")
                         @Override
                         public void handleMessage(Message message) {
                             Bundle bundle = message.getData();
@@ -131,9 +201,9 @@ public class LoginFragment extends Fragment {
 
                             Toast toast = Toast.makeText(context, text, duration);
                             toast.show();
-//                            if (listener != null) {
-//                                listener.signedIn();
-//                            }
+                            if (listener != null) {
+                                listener.signedIn();
+                            }
                         }
                     };
                     DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), loginRequest);
@@ -147,59 +217,71 @@ public class LoginFragment extends Fragment {
 
             }
 
-
-
         });
 
         RadioGroup radioGroup;
-
         radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup);
-        Button registerButton = view.findViewById(R.id.registerButton);
+        registerButton = view.findViewById(R.id.registerButton);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                radioButtonClicked = true;
+                radioButton = (RadioButton) view.findViewById(checkedId);
+                gender = radioButton.getText().toString();
+                validateRegister();
+            }
+        });
+
+
         registerButton.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View view) {
                 try {
                     /* Radio Buttons */
-                    int selectedId = radioGroup.getCheckedRadioButtonId();
 
-                    RadioButton radioButton = (RadioButton) getActivity().findViewById(selectedId);
-                    String gender = radioButton.getText().toString();
                     RegisterRequest registerRequest = new RegisterRequest(username.getText().toString(), password.getText().toString(),
-                        email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
+                            email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
-                    if(listener != null) {
-                        listener.signedIn();
 
-                        Handler threadHandler = new Handler(Looper.getMainLooper()) {
-                            public void handleMessage(Message message) {
-                                Bundle bundle = message.getData();
-                                boolean isSuccess = bundle.getBoolean("Success");
-                                Context context = getActivity();
-                                CharSequence text;
-                                int duration = Toast.LENGTH_SHORT;
-                                if (isSuccess) {
-                                    text = "Register Successful";
-                                    String firstLastName = bundle.getString("firstLastName");
-                                    Toast toast = Toast.makeText(context, firstLastName, duration);
-                                    toast.show();
-                                } else {
-                                    text = "Register Failed";
-                                }
-
-                                Toast toast = Toast.makeText(context, text, duration);
+                    @SuppressLint("HandlerLeak") Handler threadHandler = new Handler() {
+                        @Override
+                        public void handleMessage(Message message) {
+                            Bundle bundle = message.getData();
+                            boolean isSuccess = bundle.getBoolean("Success");
+                            Context context = getActivity();
+                            CharSequence text;
+                            int duration = Toast.LENGTH_SHORT;
+                            if (isSuccess) {
+                                text = "Register Successful";
+                                String firstLastName = bundle.getString("firstLastName");
+                                Toast toast = Toast.makeText(context, firstLastName, duration);
                                 toast.show();
+                            } else {
+                                text = "Register Failed";
                             }
-                        };
-                        DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), registerRequest);
-                        ExecutorService executor = Executors.newSingleThreadExecutor();
-                        executor.submit(task);
 
-                    }
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+
+                            if (listener != null) {
+                                listener.registered();
+                            }
+                        }
+                    };
+                    DownloadTask task = new DownloadTask(threadHandler, serverHost.getText().toString(), serverPort.getText().toString(), registerRequest);
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    executor.submit(task);
+
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
                 }
             }
         });
+        validate();
+        validateRegister();
         return view;
     }
 }
