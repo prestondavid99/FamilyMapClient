@@ -14,7 +14,6 @@
         android:id="@+id/settings_button"
         android:title="@string/settings"
         android:icon="@drawable/ic_baseline_settings_24"
-        app:showAsAction="always"
+        app:showAsAction="always"/>
 
-        />
 </menu>

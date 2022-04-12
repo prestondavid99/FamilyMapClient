@@ -224,7 +224,6 @@ public class ServerProxy {
             writeString(reqData, reqBody);
 
             reqBody.close();
-            // TODO : it should be ok, but it's not
             if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 // Get the input stream containing the HTTP response body
                 InputStream respBody = http.getInputStream();

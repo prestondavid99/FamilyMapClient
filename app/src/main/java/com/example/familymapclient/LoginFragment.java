@@ -41,7 +41,7 @@ import requestresult.RegisterRequest;
  */
 public class LoginFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
+
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -50,7 +50,6 @@ public class LoginFragment extends Fragment {
     private static final String TOTAL_SIZE_KEY = "TotalSizeKey";
     private TextView totalSizeTextView;
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private EditText serverHost;
@@ -85,7 +84,7 @@ public class LoginFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment LoginFragment.
      */
-    // TODO: Rename and change types and number of parameters
+
     public static LoginFragment newInstance(String param1, String param2) {
         LoginFragment fragment = new LoginFragment();
         Bundle args = new Bundle();
@@ -142,11 +141,11 @@ public class LoginFragment extends Fragment {
 
         serverHost.setText("10.0.2.2");
         serverPort.setText("8080");
-        username.setText("thisUser");
-        password.setText("password");
-        firstName.setText("firsName");
-        lastName.setText("lastName");
-        email.setText("email");
+        username.setText("sheila");
+        password.setText("parker");
+        firstName.setText("Sheila");
+        lastName.setText("Parker");
+        email.setText("sheila@parker.com");
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -285,6 +284,7 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
+
         validate();
         validateRegister();
         return view;

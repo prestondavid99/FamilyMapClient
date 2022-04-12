@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">FamilyMapClient</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="server_host">Server Host:</string>
     <string name="enter_server_host">Enter Server Host</string>
@@ -23,4 +22,6 @@
     <string name="register">Register</string>
     <string name="search">Search</string>
     <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="click_on_a_marker_to_see_event_details">Click on a marker to see event details</string>
 </resources>

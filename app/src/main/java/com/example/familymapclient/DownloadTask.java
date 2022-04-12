@@ -1,11 +1,8 @@
 package com.example.familymapclient;
 
-import android.content.Context;
-import android.media.metrics.Event;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
 
 import model.Person;
 import requestresult.EventResult;
@@ -22,6 +19,13 @@ public class DownloadTask implements Runnable {
     private String hostPort;
     private LoginRequest l;
     private RegisterRequest r;
+    private DataCache dataCache = DataCache.getInstance();
+
+    public boolean isWorking() {
+        return working;
+    }
+
+    private boolean working;
 
     public DownloadTask(Handler messageHandler, String hostSever, String hostPort, LoginRequest l) {
         this.messageHandler = messageHandler;
@@ -40,40 +44,47 @@ public class DownloadTask implements Runnable {
     @Override
     public void run() {
 
-        DataCache dataCache = DataCache.getInstance();
+
         ServerProxy sp = new ServerProxy(hostServer, hostPort);
         LoginResult loginResult = sp.login(l);
         RegisterResult registerResult = sp.register(r);
         String text;
 
-        // TODO? : Does sign in have to toast an error for every single error? Like if it can't connect to the server?
+        // LOGIN
         if (loginResult != null) {
             if (loginResult.isSuccess()) {
                 EventResult eventResult = sp.getEvents(loginResult.getAuthtoken());
                 PersonResult personResult = sp.getPeople(loginResult.getAuthtoken());
                 dataCache.setEvents(eventResult.getData());
                 dataCache.setPeople(personResult.getData());
+                dataCache.FillCache();
+                working = true;
 
                 Person person = findPerson(loginResult.getPersonID(), personResult.getData());
 
                 text = person.getFirstName() + " " + person.getLastName();
             } else {
                 text = "Login Failed;";
+                working = false;
             }
             sendMessage(loginResult, text);
         }
 
+        // REGISTER
         if (registerResult != null) {
             if (registerResult.isSuccess()) {
                 EventResult eventResult = sp.getEvents(registerResult.getAuthtoken());
                 PersonResult personResult = sp.getPeople(registerResult.getAuthtoken());
                 dataCache.setEvents(eventResult.getData());
                 dataCache.setPeople(personResult.getData());
+                dataCache.FillCache();
+                working = true;
 
                 Person person = findPerson(registerResult.getPersonID(), personResult.getData());
 
                 text = person.getFirstName() + " " + person.getLastName();
             } else {
+                working = false;
                 text = "Register Failed;";
             }
             sendMessage(registerResult, text);
@@ -81,6 +92,7 @@ public class DownloadTask implements Runnable {
 
         if (registerResult == null && loginResult == null) {
             text = "Error";
+            working = false;
             sendMessage(loginResult, text);
         }
     }
@@ -117,5 +129,9 @@ public class DownloadTask implements Runnable {
             }
         }
         return null;
+    }
+
+    public DataCache getDataCache() {
+        return dataCache;
     }
 }

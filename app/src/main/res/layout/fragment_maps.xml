@@ -2,40 +2,67 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    app:layout_constraintTop_toTopOf="@id/map">
+    android:weightSum="1"
+    >
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="575dp"
+        android:layout_height="0dp"
+        android:layout_weight="0.90"
         tools:context=".MapsFragment" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="20dp"
+        android:layout_margin="8dp"
+        android:layout_weight="0.1"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:gravity="center">
+        tools:ignore="ObsoleteLayoutParam">
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/gender_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+
             tools:srcCompat="@tools:sample/avatars" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="TextView"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:gravity="center"
-            android:textAlignment="center"
-            />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/person_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/click_on_a_marker_to_see_event_details"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                tools:ignore="InefficientWeight,NestedWeights" />
+
+            <TextView
+                android:id="@+id/event_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textAlignment="center"
+                tools:ignore="InefficientWeight,NestedWeights" />
+        </LinearLayout>
+
     </LinearLayout>
 
 

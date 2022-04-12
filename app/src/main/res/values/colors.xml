@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="male_icon">#1591F3</color>
+    <color name="android_icon">#47C902</color>
+    <color name="female_icon">#F19CFA</color>
 </resources>
