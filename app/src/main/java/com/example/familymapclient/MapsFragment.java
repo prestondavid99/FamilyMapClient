@@ -19,7 +19,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.Iconify;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import model.Event;
 import model.Person;
@@ -38,6 +36,7 @@ import model.Person;
 public class MapsFragment extends Fragment {
 
     private DataCache cache = DataCache.getInstance();
+    private GoogleMap map;
     private TextView name;
     private TextView eventText;
     private ImageView genderImageView;
@@ -55,8 +54,9 @@ public class MapsFragment extends Fragment {
         @Override
         // When map is loaded.
         public void onMapReady(GoogleMap googleMap) {
+            map = googleMap;
             makeMarkers(googleMap);
-            drawLines(googleMap);
+
         }
     };
 
@@ -77,7 +77,6 @@ public class MapsFragment extends Fragment {
         eventText = view.findViewById(R.id.event_text);
         return view;
     }
-
 
 
     @Override
@@ -108,6 +107,18 @@ public class MapsFragment extends Fragment {
                     name.setText(formatPersonText(currPerson));
                     eventText.setText(formatEventText(event));
 
+                    // EVENT lines
+                    eventLines(event);
+                    for (PolylineOptions line : cache.getEventLines()) {
+                        map.addPolyline(line);
+                    }
+
+                    // FAMILY lines
+                    parentLines(currPerson, 10);
+                    for (PolylineOptions line : cache.getFamilyLines()) {
+                        map.addPolyline(line);
+                    }
+
                     if (currPerson.getGender().equals("m") ||
                             (currPerson.getGender().equals("male"))) {
                         genderImageView.setImageDrawable(maleIcon);
@@ -130,31 +141,72 @@ public class MapsFragment extends Fragment {
     }
 
 
-    public void drawLines(GoogleMap googleMap) {
+    public void eventLines(Event event) {
         Map<Person, ArrayList<Event>> map = cache.getEventsMap();
-        for (Person p : map.keySet()) { // For every Person in the map
-            for (int i = 0; i < map.get(p).size(); i++) { // For every event in the Person
-                ArrayList<Event> arrayList = map.get(p); // Get the event list for that Person
+        Person currPerson = null;
+        ArrayList<PolylineOptions> polyLineEvents = new ArrayList<>();
+        for (Person p : map.keySet()) {
+            if (p.equals(event.getPersonID())) {
+                currPerson = p;
+            }
+        }
+
+        // Event Lines
+        if (map.get(currPerson).size() > 0) {
+            for (int i = 0; i < map.get(currPerson).size() - 1; i++) { // For every event in the Person
+                ArrayList<Event> arrayList = map.get(currPerson); // Get the event list for that Person
+
                 Event e = arrayList.get(i);
                 LatLng startPoint;
                 LatLng endPoint;
+
                 PolylineOptions options = new PolylineOptions().color(20).width(3);
-                if (i == 0) {
                     startPoint = new LatLng(e.getLatitude(), e.getLongitude());
-                    options.add(startPoint);
-                } else {
-                    endPoint = new LatLng(e.getLatitude(), e.getLongitude());
-                    options.add(endPoint);
-                }
-
-                googleMap.addPolyline(options);
-
+                    endPoint = new LatLng(arrayList.get(i + 1).getLatitude(), arrayList.get(i + 1).getLongitude());
+                    options.add(startPoint, endPoint);
+                    polyLineEvents.add(options);
             }
+            cache.setEventLines(polyLineEvents);
+
+
+
+
         }
     }
 
-    public void parseLines(ArrayList<Event> eventList, LatLng start, int i) {
-        eventList.get(i);
+    public void parentLines(Person currPerson, int width) {
+        Map<Person, ArrayList<Event>> map = cache.getEventsMap();
+        ArrayList<PolylineOptions> parentLines = new ArrayList<>();
+        ArrayList<Event> startEventList = map.get(currPerson);
+        Person father = cache.findPerson(cache.getPeople(), currPerson.getFatherID());
+        Person mother = cache.findPerson(cache.getPeople(), currPerson.getMotherID());
+        float fatherLatitude = map.get(father).get(0).getLatitude();
+        float fatherLongitude = map.get(father).get(0).getLongitude();
+        float motherLatitude = map.get(mother).get(0).getLatitude();
+        float motherLongitude = map.get(mother).get(0).getLongitude();
+        float startLatitude = startEventList.get(0).getLatitude();
+        float startLongitude = startEventList.get(0).getLongitude();
+
+        if (width > 2) {
+            if (currPerson.getFatherID() != null) {
+                LatLng startPoint = new LatLng(startLatitude, startLongitude);
+                LatLng endPoint = new LatLng(fatherLatitude, fatherLongitude);
+                PolylineOptions newLine = new PolylineOptions().color(200);
+                newLine.add(startPoint, endPoint);
+                parentLines.add(newLine);
+                parentLines(father, width - 2);
+            }
+
+            if (currPerson.getMotherID() != null) {
+                LatLng startPoint = new LatLng(startLatitude, startLongitude);
+                LatLng endPoint = new LatLng(motherLatitude, motherLongitude);
+                PolylineOptions newLine = new PolylineOptions().color(200);
+                newLine.add(startPoint, endPoint);
+                parentLines.add(newLine);
+                parentLines(mother, width - 2);
+            }
+        }
+
     }
 
     public float getEventColor(Event e) {

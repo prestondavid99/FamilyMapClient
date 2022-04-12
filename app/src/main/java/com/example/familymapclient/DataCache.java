@@ -1,5 +1,7 @@
 package com.example.familymapclient;
 
+import com.google.android.gms.maps.model.PolylineOptions;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +13,25 @@ import model.Person;
 public class DataCache {
 
     private static DataCache instance;
+    private ArrayList<PolylineOptions> eventLines;
+    private ArrayList<PolylineOptions> familyLines;
+
+    public ArrayList<PolylineOptions> getEventLines() {
+        return eventLines;
+    }
+
+    public void setEventLines(ArrayList<PolylineOptions> eventLines) {
+        this.eventLines = eventLines;
+    }
+
+    public ArrayList<PolylineOptions> getFamilyLines() {
+        return familyLines;
+    }
+
+    public void setFamilyLines(ArrayList<PolylineOptions> familyLines) {
+        this.familyLines = familyLines;
+    }
+
     private Person[] people;
     private Event[] events;
     private Map<Person, ArrayList<Event>> eventsMap = new HashMap<>();
