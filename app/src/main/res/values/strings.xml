@@ -31,4 +31,6 @@
     <string name="life_story_lines">Life Story Lines</string>
     <string name="show_life_story_lines">SHOW LIFE STORY LINES</string>
     <string name="family_tree_lines">Family Tree Lines</string>
+    <string name="list_view_people">List People</string>
+    <string name="list_view_events">List Events</string>
 </resources>

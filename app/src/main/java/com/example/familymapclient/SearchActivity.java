@@ -19,6 +19,7 @@ import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import model.Event;
 import model.Person;
@@ -28,8 +29,10 @@ public class SearchActivity extends AppCompatActivity {
     private static final int PERSON_VIEW_TYPE = 0;
     private static final int EVENT_VIEW_TYPE = 1;
 
-    private ArrayList<Event> events = new ArrayList<>();
-    private ArrayList<Person> people = new ArrayList<>();
+    private DataCache cache = DataCache.getInstance();
+
+    private ArrayList<Event> events;
+    private ArrayList<Person> people;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,14 @@ public class SearchActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.RecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
+
+        events = new ArrayList<>(Arrays.asList(cache.getEvents()));
+        people = new ArrayList<>(Arrays.asList(cache.getPeople()));
+
+        PersonEventAdapter adapter = new PersonEventAdapter(events, people);
+        recyclerView.setAdapter(adapter);
+
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -66,6 +77,7 @@ public class SearchActivity extends AppCompatActivity {
         @NonNull
         @Override
         public PersonEventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
             View view;
 
             if (viewType == EVENT_VIEW_TYPE) {
@@ -79,14 +91,16 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull PersonEventViewHolder holder, int position) {
             if (position < events.size()) {
-
+                holder.bind(events.get(position));
+            } else {
+                holder.bind(people.get(position));
             }
         }
 
 
         @Override
         public int getItemCount() {
-            return 0;
+            return events.size() + people.size();
         }
     }
 
@@ -153,14 +167,11 @@ public class SearchActivity extends AppCompatActivity {
         public void onClick(View v) {
             if(viewType == EVENT_VIEW_TYPE) {
                 // This is were we could pass the skiResort to a ski resort detail activity
-
-                Toast.makeText(SearchActivity.this, String.format("Enjoy skiing %s!",
-                        event.getEventType()), Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getBaseContext(), EventActivity.class));
             } else {
                 // This is were we could pass the hikingTrail to a hiking trail detail activity
+                startActivity(new Intent(getBaseContext(), PersonActivity.class));
 
-                Toast.makeText(SearchActivity.this, String.format("Enjoy hiking %s. It's %s.",
-                        formatPersonText(person), Toast.LENGTH_SHORT);
             }
         }
 
