@@ -13,8 +13,67 @@ import model.Person;
 public class DataCache {
 
     private static DataCache instance;
-    private ArrayList<PolylineOptions> eventLines;
-    private ArrayList<PolylineOptions> familyLines;
+    private ArrayList<PolylineOptions> eventLines = new ArrayList<>();
+    private ArrayList<PolylineOptions> spouseLines = new ArrayList<>();
+
+    public void clearSpouseLines() {
+        this.spouseLines.clear();
+    }
+
+    public void addSpouseLine(PolylineOptions p) {
+        spouseLines.add(p);
+    }
+
+    public ArrayList<PolylineOptions> getSpouseLines() {
+        return spouseLines;
+    }
+
+    public void setSpouseLines(ArrayList<PolylineOptions> spouseLines) {
+        this.spouseLines = spouseLines;
+    }
+
+    private ArrayList<PolylineOptions> familyLines = new ArrayList<>();
+
+    private Person[] people;
+    private Event[] events;
+    private Map<Person, ArrayList<Event>> eventsMap = new HashMap<>();
+
+    public Person getCurrPerson() {
+        return currPerson;
+    }
+
+    public void setCurrPerson(Person currPerson) {
+        this.currPerson = currPerson;
+    }
+
+    Person currPerson;
+
+    private ArrayList<Event> personEvents = new ArrayList<>();
+    private ArrayList<Person> personFamily = new ArrayList<>();
+
+    public ArrayList<Event> getPersonEvents() {
+        return personEvents;
+    }
+
+    public void addPersonEvent(Event e) {
+        personEvents.add(e);
+    }
+
+    public void addPersonFamily(Person p) {
+        personFamily.add(p);
+    }
+
+    public void setPersonEvents(ArrayList<Event> personEvents) {
+        this.personEvents = personEvents;
+    }
+
+    public ArrayList<Person> getPersonFamily() {
+        return personFamily;
+    }
+
+    public void setPersonFamily(ArrayList<Person> personFamily) {
+        this.personFamily = personFamily;
+    }
 
     public ArrayList<PolylineOptions> getEventLines() {
         return eventLines;
@@ -22,6 +81,14 @@ public class DataCache {
 
     public void setEventLines(ArrayList<PolylineOptions> eventLines) {
         this.eventLines = eventLines;
+    }
+
+    public void clearEventLines() {
+        this.eventLines.clear();
+    }
+
+    public void clearFamilyLines() {
+        this.familyLines.clear();
     }
 
     public ArrayList<PolylineOptions> getFamilyLines() {
@@ -32,9 +99,9 @@ public class DataCache {
         this.familyLines = familyLines;
     }
 
-    private Person[] people;
-    private Event[] events;
-    private Map<Person, ArrayList<Event>> eventsMap = new HashMap<>();
+    public void addFamilyLine(PolylineOptions polylineOptions) {
+        this.familyLines.add(polylineOptions);
+    }
 
     public Person[] getPeople() {
         return people;

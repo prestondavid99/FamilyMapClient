@@ -12,6 +12,17 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        getSupportActionBar().setTitle("Settings");
+
+        if (findViewById(R.id.settingsFrameLayout) != null){
+            if (savedInstanceState != null){
+                return;
+            }
+
+            getFragmentManager().beginTransaction().add(R.id.settingsFrameLayout, new SettingsFragment()).commit();
+        }
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

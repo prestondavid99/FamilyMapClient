@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -28,9 +29,12 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragmentFrameLayout);
 
+
+
         if (fragment == null) {
             fragment = createLoginFragment();
 
+            getSupportActionBar().setTitle("Family Map");
             fragmentManager.beginTransaction().add(R.id.fragmentFrameLayout, fragment).commit();
         } else {
             if (fragment instanceof LoginFragment) {
@@ -59,12 +63,14 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
     }
 
     public void settings() {
+
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 
     public void search() {
-
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
     }
 
 

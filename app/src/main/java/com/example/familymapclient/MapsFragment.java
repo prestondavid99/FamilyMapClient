@@ -4,13 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -19,6 +22,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.Iconify;
@@ -36,27 +40,20 @@ import model.Person;
 public class MapsFragment extends Fragment {
 
     private DataCache cache = DataCache.getInstance();
-    private GoogleMap map;
     private TextView name;
     private TextView eventText;
     private ImageView genderImageView;
+    private LinearLayout linearLayout;
+    private boolean canClickLayout;
+    private ArrayList<Polyline> eventLines = new ArrayList<>();
+    private ArrayList<Polyline> familyLines = new ArrayList<>();
+    private ArrayList<Polyline> spouseLines = new ArrayList<>();
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
-
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
         @Override
         // When map is loaded.
         public void onMapReady(GoogleMap googleMap) {
-            map = googleMap;
+            // map = googleMap;
             makeMarkers(googleMap);
-
         }
     };
 
@@ -75,6 +72,7 @@ public class MapsFragment extends Fragment {
         genderImageView.setImageDrawable(genderIcon);
         name = view.findViewById(R.id.person_name);
         eventText = view.findViewById(R.id.event_text);
+        canClickLayout = false;
         return view;
     }
 
@@ -82,6 +80,7 @@ public class MapsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        linearLayout = view.findViewById(R.id.linear_layout);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
@@ -98,26 +97,70 @@ public class MapsFragment extends Fragment {
             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(@NonNull Marker marker) {
+                    canClickLayout = true;
+
+                    if (eventLines != null && !eventLines.isEmpty()) {
+                        for (Polyline line : eventLines) {
+                            line.remove();
+                        }
+                        eventLines.clear();
+                    }
+
+                    if (familyLines != null && !familyLines.isEmpty()) {
+                        for (Polyline line : familyLines) {
+                            line.remove();
+                        }
+                        familyLines.clear();
+                    }
+
+                    if (spouseLines != null && !spouseLines.isEmpty()) {
+                        for (Polyline line : spouseLines) {
+                            line.remove();
+                        }
+                        spouseLines.clear();
+                    }
+
                     Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
                             colorRes(R.color.male_icon).sizeDp(50);
                     Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
                             colorRes(R.color.female_icon).sizeDp(50);
                     Event event = (Event) marker.getTag();
                     Person currPerson = cache.findPerson(cache.getPeople(), event.getPersonID());
+                    cache.setCurrPerson(currPerson);
                     name.setText(formatPersonText(currPerson));
                     eventText.setText(formatEventText(event));
 
                     // EVENT lines
                     eventLines(event);
-                    for (PolylineOptions line : cache.getEventLines()) {
-                        map.addPolyline(line);
+                    if (cache.getEventLines() != null) {
+                        for (PolylineOptions line : cache.getEventLines()) {
+                            Polyline newLine = googleMap.addPolyline(line);
+                            eventLines.add(newLine);
+                        }
+                        cache.clearEventLines();
                     }
 
-                    // FAMILY lines
+
                     parentLines(currPerson, 10);
-                    for (PolylineOptions line : cache.getFamilyLines()) {
-                        map.addPolyline(line);
+
+                    // SPOUSE Lines
+                    if (cache.getSpouseLines() != null) {
+                        for (PolylineOptions line : cache.getSpouseLines()) {
+                            Polyline newLine = googleMap.addPolyline(line);
+                            spouseLines.add(newLine);
+                        }
+                        cache.clearSpouseLines();
                     }
+
+                    // PARENT lines
+                    if (cache.getFamilyLines() != null) {
+                        for (PolylineOptions line : cache.getFamilyLines()) {
+                            Polyline newLine = googleMap.addPolyline(line);
+                            familyLines.add(newLine);
+                        }
+                        cache.clearFamilyLines();
+                    }
+
 
                     if (currPerson.getGender().equals("m") ||
                             (currPerson.getGender().equals("male"))) {
@@ -126,6 +169,19 @@ public class MapsFragment extends Fragment {
                         genderImageView.setImageDrawable(femaleIcon);
                     }
                     return false;
+                }
+            });
+
+            linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (canClickLayout) {
+                        startActivity(new Intent(getContext(), PersonActivity.class));
+                    } else {
+                        Toast toast = Toast.makeText(getContext(), "Select a marker", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+
                 }
             });
         }
@@ -146,8 +202,11 @@ public class MapsFragment extends Fragment {
         Person currPerson = null;
         ArrayList<PolylineOptions> polyLineEvents = new ArrayList<>();
         for (Person p : map.keySet()) {
-            if (p.equals(event.getPersonID())) {
+            if (p.getPersonID().equals(event.getPersonID())) {
                 currPerson = p;
+                for (Event e : map.get(p)) {
+                    cache.addPersonEvent(e);
+                }
             }
         }
 
@@ -157,20 +216,18 @@ public class MapsFragment extends Fragment {
                 ArrayList<Event> arrayList = map.get(currPerson); // Get the event list for that Person
 
                 Event e = arrayList.get(i);
+                Event nextE = arrayList.get(i + 1);
                 LatLng startPoint;
                 LatLng endPoint;
 
-                PolylineOptions options = new PolylineOptions().color(20).width(3);
-                    startPoint = new LatLng(e.getLatitude(), e.getLongitude());
-                    endPoint = new LatLng(arrayList.get(i + 1).getLatitude(), arrayList.get(i + 1).getLongitude());
-                    options.add(startPoint, endPoint);
-                    polyLineEvents.add(options);
+                startPoint = new LatLng(e.getLatitude(), e.getLongitude());
+                endPoint = new LatLng(nextE.getLatitude(), nextE.getLongitude());
+                PolylineOptions options = new PolylineOptions().add(startPoint).add(endPoint)
+                        .color(getActivity().getResources()
+                        .getColor(R.color.teal_200)).width(10);
+                polyLineEvents.add(options);
             }
             cache.setEventLines(polyLineEvents);
-
-
-
-
         }
     }
 
@@ -178,35 +235,55 @@ public class MapsFragment extends Fragment {
         Map<Person, ArrayList<Event>> map = cache.getEventsMap();
         ArrayList<PolylineOptions> parentLines = new ArrayList<>();
         ArrayList<Event> startEventList = map.get(currPerson);
-        Person father = cache.findPerson(cache.getPeople(), currPerson.getFatherID());
-        Person mother = cache.findPerson(cache.getPeople(), currPerson.getMotherID());
-        float fatherLatitude = map.get(father).get(0).getLatitude();
-        float fatherLongitude = map.get(father).get(0).getLongitude();
-        float motherLatitude = map.get(mother).get(0).getLatitude();
-        float motherLongitude = map.get(mother).get(0).getLongitude();
+
         float startLatitude = startEventList.get(0).getLatitude();
         float startLongitude = startEventList.get(0).getLongitude();
 
+        if (currPerson.getSpouseID() != null) {
+            Person spouse = cache.findPerson(cache.getPeople(), currPerson.getSpouseID());
+            if (cache.getEventsMap().get(spouse) != null && !cache.getEventsMap().get(spouse).isEmpty()) {
+                for (Event e : cache.getEventsMap().get(spouse)) {
+                    float endLatitude = map.get(spouse).get(0).getLatitude();
+                    float endLongitude = map.get(spouse).get(0).getLongitude();
+                    LatLng start = new LatLng(startLatitude, startLongitude);
+                    LatLng end = new LatLng(endLatitude, endLongitude);
+                    PolylineOptions polylineOptions = new PolylineOptions().width(width)
+                            .color(getActivity().getResources().getColor(R.color.female_icon));
+                    polylineOptions.add(start, end);
+                    cache.addSpouseLine(polylineOptions);
+
+                }
+            }
+
+        }
+
         if (width > 2) {
             if (currPerson.getFatherID() != null) {
+                Person father = cache.findPerson(cache.getPeople(), currPerson.getFatherID());
+                float fatherLatitude = map.get(father).get(0).getLatitude();
+                float fatherLongitude = map.get(father).get(0).getLongitude();
                 LatLng startPoint = new LatLng(startLatitude, startLongitude);
                 LatLng endPoint = new LatLng(fatherLatitude, fatherLongitude);
-                PolylineOptions newLine = new PolylineOptions().color(200);
+                PolylineOptions newLine = new PolylineOptions().color(getActivity().getResources().getColor(R.color.purple_500)).width(width);
                 newLine.add(startPoint, endPoint);
                 parentLines.add(newLine);
+                cache.addFamilyLine(newLine);
                 parentLines(father, width - 2);
             }
 
             if (currPerson.getMotherID() != null) {
+                Person mother = cache.findPerson(cache.getPeople(), currPerson.getMotherID());
+                float motherLatitude = map.get(mother).get(0).getLatitude();
+                float motherLongitude = map.get(mother).get(0).getLongitude();
                 LatLng startPoint = new LatLng(startLatitude, startLongitude);
                 LatLng endPoint = new LatLng(motherLatitude, motherLongitude);
-                PolylineOptions newLine = new PolylineOptions().color(200);
+                PolylineOptions newLine = new PolylineOptions().color(getActivity().getResources().getColor(R.color.purple_500)).width(width);
                 newLine.add(startPoint, endPoint);
                 parentLines.add(newLine);
+                cache.addFamilyLine(newLine);
                 parentLines(mother, width - 2);
             }
         }
-
     }
 
     public float getEventColor(Event e) {
